@@ -9,10 +9,10 @@
 <body>
     <div class="container bg-info">
         <h1 class="text-center">Expense Tracker</h1>
-        <form id="expenseForm" class="mb-3 ">
+        <form id="expenseForm" class="mb-3">
             <div class="form-group">
-                <label for="expenseName">Expense Description</label>
-                <input type="text" class="form-control" id="expenseName" required>
+                <label for="expenseDescription">Expense Description</label>
+                <input type="text" class="form-control" id="expenseDescription" required>
             </div>
             <div class="form-group">
                 <label for="expenseAmount">Expense Amount</label>
@@ -24,8 +24,8 @@
                     <option value="movie">Movie</option>
                     <option value="fuel">Fuel</option>
                     <option value="rent">Rent</option>
-                    <option value="rent">Coaching Fee</option>
-                    <option value="rent">Daily expenses</option>
+                    <option value="coaching_fee">Coaching Fee</option>
+                    <option value="daily_expenses">Daily Expenses</option>
                 </select>
             </div>
             <button type="submit" class="btn btn-primary">Add Expense</button>
@@ -47,8 +47,8 @@
 
     <script>
         // Check if there are any expenses in local storage, and initialize the expense list
-        let expenses = localStorage.getItem('expenses');
-        expenses = expenses ? JSON.parse(expenses) : [];
+        let expensesData = localStorage.getItem('expensesData');
+        let expenses = expensesData ? JSON.parse(expensesData) : [];
 
         // Function to render the expense list
         function renderExpenseList() {
@@ -58,7 +58,7 @@
             expenses.forEach((expense, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${expense.name}</td>
+                    <td>${expense.description}</td>
                     <td>Rs${expense.amount}</td>
                     <td>${expense.category}</td>
                     <td>
@@ -71,14 +71,14 @@
         }
 
         // Function to add a new expense
-        function addExpense(name, amount, category) {
+        function addExpense(description, amount, category) {
             const expense = {
-                name: name,
+                description: description,
                 amount: amount,
                 category: category
             };
             expenses.push(expense);
-            localStorage.setItem('expenses', JSON.stringify(expenses));
+            localStorage.setItem('expensesData', JSON.stringify(expenses));
             renderExpenseList();
             expenseForm.reset();
         }
@@ -86,16 +86,16 @@
         // Function to delete an expense
         function deleteExpense(index) {
             expenses.splice(index, 1);
-            localStorage.setItem('expenses', JSON.stringify(expenses));
+            localStorage.setItem('expensesData', JSON.stringify(expenses));
             renderExpenseList();
         }
 
         // Function to edit an expense
-        function editExpense(index, name, amount, category) {
-            expenses[index].name = name;
+        function editExpense(index, description, amount, category) {
+            expenses[index].description = description;
             expenses[index].amount = amount;
             expenses[index].category = category;
-            localStorage.setItem('expenses', JSON.stringify(expenses));
+            localStorage.setItem('expensesData', JSON.stringify(expenses));
             renderExpenseList();
             expenseForm.reset();
         }
@@ -104,19 +104,19 @@
         const expenseForm = document.getElementById('expenseForm');
         expenseForm.addEventListener('submit', function (e) {
             e.preventDefault();
-            const expenseName = document.getElementById('expenseName').value;
+            const expenseDescription = document.getElementById('expenseDescription').value;
             const expenseAmount = document.getElementById('expenseAmount').value;
             const expenseCategory = document.getElementById('expenseCategory').value;
 
             const editIndex = expenseForm.getAttribute('data-edit-index');
             if (editIndex !== null) {
-                editExpense(editIndex, expenseName, expenseAmount, expenseCategory);
+                editExpense(editIndex, expenseDescription, expenseAmount, expenseCategory);
                 expenseForm.removeAttribute('data-edit-index');
                 document.getElementById('expenseForm').reset();
                 return;
             }
 
-            addExpense(expenseName, expenseAmount, expenseCategory);
+            addExpense(expenseDescription, expenseAmount, expenseCategory);
         });
 
         // Event listener for the delete expense buttons
@@ -131,7 +131,7 @@
                 const index = e.target.getAttribute('data-index');
                 const expense = expenses[index];
                 expenseForm.setAttribute('data-edit-index', index);
-                document.getElementById('expenseName').value = expense.name;
+                document.getElementById('expenseDescription').value = expense.description;
                 document.getElementById('expenseAmount').value = expense.amount;
                 document.getElementById('expenseCategory').value = expense.category;
             }
