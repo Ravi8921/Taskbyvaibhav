@@ -7,11 +7,11 @@
 </head>
 
 <body>
-    <div class="container ">
+    <div class="container bg-info">
         <h1 class="text-center">Expense Tracker</h1>
         <form id="expenseForm" class="mb-3 ">
             <div class="form-group">
-                <label for="expenseName">Expense Name</label>
+                <label for="expenseName">Expense Description</label>
                 <input type="text" class="form-control" id="expenseName" required>
             </div>
             <div class="form-group">
@@ -24,6 +24,8 @@
                     <option value="movie">Movie</option>
                     <option value="fuel">Fuel</option>
                     <option value="rent">Rent</option>
+                    <option value="rent">Coaching Fee</option>
+                    <option value="rent">Daily expenses</option>
                 </select>
             </div>
             <button type="submit" class="btn btn-primary">Add Expense</button>
@@ -31,7 +33,7 @@
         <table id="expenseTable" class="table">
             <thead>
                 <tr>
-                    <th>Expense Name</th>
+                    <th>Expense Description</th>
                     <th>Expense Amount</th>
                     <th>Expense Category</th>
                     <th>Action</th>
@@ -57,7 +59,7 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${expense.name}</td>
-                    <td>$${expense.amount}</td>
+                    <td>Rs${expense.amount}</td>
                     <td>${expense.category}</td>
                     <td>
                         <button class="btn btn-primary btn-sm editExpense" data-index="${index}">Edit</button>
