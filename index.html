@@ -1,145 +1,44 @@
 <!DOCTYPE html>
-<html>
-
-<head>
-    <title>Expense Tracker</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-
-<body>
-    <div class="container bg-info">
-        <h1 class="text-center">Expense Tracker</h1>
-        <form id="expenseForm" class="mb-3">
-            <div class="form-group">
-                <label for="expenseDescription">Expense Description</label>
-                <input type="text" class="form-control" id="expenseDescription" required>
-            </div>
-            <div class="form-group">
-                <label for="expenseAmount">Expense Amount</label>
-                <input type="number" class="form-control" id="expenseAmount" required>
-            </div>
-            <div class="form-group">
-                <label for="expenseCategory">Expense Category</label>
-                <select class="form-control" id="expenseCategory" required>
-                    <option value="movie">Movie</option>
-                    <option value="fuel">Fuel</option>
-                    <option value="rent">Rent</option>
-                    <option value="coaching_fee">Coaching Fee</option>
-                    <option value="daily_expenses">Daily Expenses</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Add Expense</button>
-        </form>
-        <table id="expenseTable" class="table">
-            <thead>
-                <tr>
-                    <th>Expense Description</th>
-                    <th>Expense Amount</th>
-                    <th>Expense Category</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="expenseList">
-                <!-- Expense items will be dynamically added here -->
-            </tbody>
-        </table>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+    <title>Axios Crash Course</title>
+  </head>
+  <body>
+    <div class="container my-5">
+      <div class="text-center">
+        <h1 class="display-4 text-center mb-3">Axios Crash Course</h1>
+        <button class="btn btn-primary my-3" id="get">GET</button>
+        <button class="btn btn-info" id="post">POST</button>
+        <button class="btn btn-warning" id="update">PUT/PATCH</button>
+        <button class="btn btn-danger" id="delete">DELETE</button>
+        <button class="btn btn-secondary" id="sim">Sim Requests</button>
+        <button class="btn btn-secondary" id="headers">
+          Custom Headers
+        </button>
+        <button class="btn btn-secondary" id="transform">
+          Transform
+        </button>
+        <button class="btn btn-secondary" id="error">
+          Error Handling
+        </button>
+        <button class="btn btn-secondary" id="cancel">
+          Cancel
+        </button>
+      </div>
+      <hr />
+      <div id="res"></div>
     </div>
 
-    <script>
-        // Check if there are any expenses in local storage, and initialize the expense list
-        let expensesData = localStorage.getItem('expensesData');
-        let expenses = expensesData ? JSON.parse(expensesData) : [];
-
-        // Function to render the expense list
-        function renderExpenseList() {
-            const expenseList = document.getElementById('expenseList');
-            expenseList.innerHTML = '';
-
-            expenses.forEach((expense, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${expense.description}</td>
-                    <td>Rs${expense.amount}</td>
-                    <td>${expense.category}</td>
-                    <td>
-                        <button class="btn btn-primary btn-sm editExpense" data-index="${index}">Edit</button>
-                        <button class="btn btn-danger btn-sm deleteExpense" data-index="${index}">Delete</button>
-                    </td>
-                `;
-                expenseList.appendChild(row);
-            });
-        }
-
-        // Function to add a new expense
-        function addExpense(description, amount, category) {
-            const expense = {
-                description: description,
-                amount: amount,
-                category: category
-            };
-            expenses.push(expense);
-            localStorage.setItem('expensesData', JSON.stringify(expenses));
-            renderExpenseList();
-            expenseForm.reset();
-        }
-
-        // Function to delete an expense
-        function deleteExpense(index) {
-            expenses.splice(index, 1);
-            localStorage.setItem('expensesData', JSON.stringify(expenses));
-            renderExpenseList();
-        }
-
-        // Function to edit an expense
-        function editExpense(index, description, amount, category) {
-            expenses[index].description = description;
-            expenses[index].amount = amount;
-            expenses[index].category = category;
-            localStorage.setItem('expensesData', JSON.stringify(expenses));
-            renderExpenseList();
-            expenseForm.reset();
-        }
-
-        // Event listener for the expense form submission
-        const expenseForm = document.getElementById('expenseForm');
-        expenseForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const expenseDescription = document.getElementById('expenseDescription').value;
-            const expenseAmount = document.getElementById('expenseAmount').value;
-            const expenseCategory = document.getElementById('expenseCategory').value;
-
-            const editIndex = expenseForm.getAttribute('data-edit-index');
-            if (editIndex !== null) {
-                editExpense(editIndex, expenseDescription, expenseAmount, expenseCategory);
-                expenseForm.removeAttribute('data-edit-index');
-                document.getElementById('expenseForm').reset();
-                return;
-            }
-
-            addExpense(expenseDescription, expenseAmount, expenseCategory);
-        });
-
-        // Event listener for the delete expense buttons
-        const expenseTable = document.getElementById('expenseTable');
-        expenseTable.addEventListener('click', function (e) {
-            if (e.target.classList.contains('deleteExpense')) {
-                const index = e.target.getAttribute('data-index');
-                deleteExpense(index);
-            }
-
-            if (e.target.classList.contains('editExpense')) {
-                const index = e.target.getAttribute('data-index');
-                const expense = expenses[index];
-                expenseForm.setAttribute('data-edit-index', index);
-                document.getElementById('expenseDescription').value = expense.description;
-                document.getElementById('expenseAmount').value = expense.amount;
-                document.getElementById('expenseCategory').value = expense.category;
-            }
-        });
-
-        // Initial rendering of the expense list
-        renderExpenseList();
-    </script>
-</body>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+    <script src="main.js"></script>
+  </body>
 </html>
