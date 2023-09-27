@@ -1,44 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-      crossorigin="anonymous"
-    />
-    <title>Axios Crash Course</title>
-  </head>
-  <body>
-    <div class="container my-5">
-      <div class="text-center">
-        <h1 class="display-4 text-center mb-3">Axios Crash Course</h1>
-        <button class="btn btn-primary my-3" id="get">GET</button>
-        <button class="btn btn-info" id="post">POST</button>
-        <button class="btn btn-warning" id="update">PUT/PATCH</button>
-        <button class="btn btn-danger" id="delete">DELETE</button>
-        <button class="btn btn-secondary" id="sim">Sim Requests</button>
-        <button class="btn btn-secondary" id="headers">
-          Custom Headers
-        </button>
-        <button class="btn btn-secondary" id="transform">
-          Transform
-        </button>
-        <button class="btn btn-secondary" id="error">
-          Error Handling
-        </button>
-        <button class="btn btn-secondary" id="cancel">
-          Cancel
-        </button>
-      </div>
-      <hr />
-      <div id="res"></div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Appointment</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Book an Appointment</h1>
+        <form id="appointmentForm">
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" class="form-control" id="fullName" placeholder="Enter your full name">
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" class="form-control" id="phone" placeholder="Enter your phone number">
+            </div>
+            <div class="form-group">
+                <label for="appointmentDate">Appointment Date</label>
+                <input type="date" class="form-control" id="appointmentDate">
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Book Appointment</button>
+        </form>
+
+        <h2 class="mt-4">Appointments</h2>
+        <ul id="appointmentList" class="list-group">
+            <!-- Appointments will be dynamically added here -->
+        </ul>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
-    <script src="main.js"></script>
-  </body>
+    <!-- Include Bootstrap JS and jQuery (for form validation) -->
+   
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Include Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // Function to fetch and display data from the API
+        function fetchData() {
+            axios.get("https://crudcrud.com/api/18dcdfb7e0354b5d8de7036a1cdc64cd")
+                .then(response => {
+                    const data = response.data;
+                    const appointmentList = document.getElementById("appointmentList");
+                    appointmentList.innerHTML = ""; // Clear the existing list
+
+                    data.forEach(appointment => {
+                        const listItem = document.createElement("li");
+                        listItem.className = "list-group-item";
+                        listItem.innerHTML = `
+                            <strong>${appointment.fullName}</strong><br>
+                            Email: ${appointment.email}<br>
+                            Phone: ${appointment.phone}<br>
+                            Appointment Date: ${appointment.appointmentDate}
+                        `;
+
+                        const removeButton = document.createElement("button");
+                        removeButton.className = "btn btn-danger btn-sm float-right remove-btn";
+                        removeButton.textContent = "Remove";
+
+                        removeButton.addEventListener("click", function() {
+                            // Remove the item from the list
+                            listItem.remove();
+                        });
+
+                        listItem.appendChild(removeButton);
+                        appointmentList.appendChild(listItem);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error fetching data:", error);
+                });
+        }
+
+        // Call the fetchData function to initially load data
+        fetchData();
+
+        document.getElementById("appointmentForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            // Get input values
+            const fullName = document.getElementById("fullName").value;
+            const email = document.getElementById("email").value;
+            const phone = document.getElementById("phone").value;
+            const appointmentDate = document.getElementById("appointmentDate").value;
+
+            // Create a new appointment object
+            const newAppointment = {
+                fullName,
+                email,
+                phone,
+                appointmentDate
+            };
+
+            // Send a POST request to the API to add the new appointment
+            axios.post("https://crudcrud.com/api/18dcdfb7e0354b5d8de7036a1cdc64cd/api", newAppointment)
+            .then(response => {
+                // After adding, fetch and display updated data
+                fetchData();
+            })
+            .catch(error => {
+                console.error("Error adding appointment:", error);
+            });
+
+            // Clear the form inputs
+            document.getElementById("fullName").value = "";
+            document.getElementById("email").value = "";
+            document.getElementById("phone").value = "";
+            document.getElementById("appointmentDate").value = "";
+        });
+    </script>
+</body>
 </html>
