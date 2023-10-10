@@ -1,145 +1,185 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>Expense Tracker</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Appointment</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
 <body>
-    <div class="container bg-info">
-        <h1 class="text-center">Expense Tracker</h1>
-        <form id="expenseForm" class="mb-3">
+    <div class="container mt-5">
+        <h1 class="text-center">Book an Appointment</h1>
+        
+        <!-- Appointment Form -->
+        <form id="appointmentForm">
+            <!-- Full Name Input -->
             <div class="form-group">
-                <label for="expenseDescription">Expense Description</label>
-                <input type="text" class="form-control" id="expenseDescription" required>
+                <label for="fullName">Full Name</label>
+                <input type="text" class="form-control" id="fullName" placeholder="Enter your full name">
             </div>
+            
+            <!-- Email Input -->
             <div class="form-group">
-                <label for="expenseAmount">Expense Amount</label>
-                <input type="number" class="form-control" id="expenseAmount" required>
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" placeholder="Enter your email">
             </div>
+            
+            <!-- Phone Number Input -->
             <div class="form-group">
-                <label for="expenseCategory">Expense Category</label>
-                <select class="form-control" id="expenseCategory" required>
-                    <option value="movie">Movie</option>
-                    <option value="fuel">Fuel</option>
-                    <option value="rent">Rent</option>
-                    <option value="coaching_fee">Coaching Fee</option>
-                    <option value="daily_expenses">Daily Expenses</option>
-                </select>
+                <label for="phone">Phone Number</label>
+                <input type="tel" class="form-control" id="phone" placeholder="Enter your phone number">
             </div>
-            <button type="submit" class="btn btn-primary">Add Expense</button>
+            
+            <!-- Appointment Date Input -->
+            <div class="form-group">
+                <label for="appointmentDate">Appointment Date</label>
+                <input type="date" class="form-control" id="appointmentDate">
+            </div>
+            
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">Book Appointment</button>
         </form>
-        <table id="expenseTable" class="table">
-            <thead>
-                <tr>
-                    <th>Expense Description</th>
-                    <th>Expense Amount</th>
-                    <th>Expense Category</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="expenseList">
-                <!-- Expense items will be dynamically added here -->
-            </tbody>
-        </table>
+
+        <!-- List of Appointments -->
+        <h2 class="mt-4">Appointments</h2>
+        <ul id="appointmentList" class="list-group">
+            <!-- Appointments will be dynamically added here -->
+        </ul>
     </div>
 
+    <!-- Include Bootstrap JS and jQuery (for form validation) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <!-- Include Axios for making API requests -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
     <script>
-        // Check if there are any expenses in local storage, and initialize the expense list
-        let expensesData = localStorage.getItem('expensesData');
-        let expenses = expensesData ? JSON.parse(expensesData) : [];
+        // Function to fetch and display data from the API
+        function fetchData() {
+            // Replace the placeholder URL with your actual API endpoint
+            axios.get("https://crudcrud.com/api/f52fb0fc98704096b135d0f5f4300bf1")
+                .then(response => {
+                    const data = response.data;
+                    const appointmentList = document.getElementById("appointmentList");
+                    appointmentList.innerHTML = ""; // Clear the existing list
 
-        // Function to render the expense list
-        function renderExpenseList() {
-            const expenseList = document.getElementById('expenseList');
-            expenseList.innerHTML = '';
+                    data.forEach(appointment => {
+                        const listItem = document.createElement("li");
+                        listItem.className = "list-group-item";
+                        listItem.setAttribute("data-id", appointment._id); // Add data-id attribute
 
-            expenses.forEach((expense, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${expense.description}</td>
-                    <td>Rs${expense.amount}</td>
-                    <td>${expense.category}</td>
-                    <td>
-                        <button class="btn btn-primary btn-sm editExpense" data-index="${index}">Edit</button>
-                        <button class="btn btn-danger btn-sm deleteExpense" data-index="${index}">Delete</button>
-                    </td>
-                `;
-                expenseList.appendChild(row);
-            });
+                        listItem.innerHTML = `
+                            <strong>${appointment.fullName}</strong><br>
+                            Email: ${appointment.email}<br>
+                            Phone: ${appointment.phone}<br>
+                            Appointment Date: ${appointment.appointmentDate}
+                        `;
+
+                        const deleteButton = document.createElement("button");
+                        deleteButton.className = "btn btn-danger btn-sm float-right delete-btn";
+                        deleteButton.textContent = "Delete";
+
+                        deleteButton.addEventListener("click", function() {
+                            // Call the deleteAppointment function when the delete button is clicked
+                            deleteAppointment(appointment._id);
+                        });
+
+                        listItem.appendChild(deleteButton);
+                        appointmentList.appendChild(listItem);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error fetching data:", error);
+                });
         }
 
-        // Function to add a new expense
-        function addExpense(description, amount, category) {
-            const expense = {
-                description: description,
-                amount: amount,
-                category: category
+        // Function to delete an appointment by _id
+        function deleteAppointment(appointmentId) {
+            // Replace the placeholder URL with your actual API endpoint
+            axios.delete(`https://crudcrud.com/api/f52fb0fc98704096b135d0f5f4300bf1/${appointmentId}`)
+                .then(response => {
+                    // If deletion is successful, remove the user detail from the website's UI
+                    const deletedItem = document.querySelector(`[data-id="${appointmentId}"]`);
+                    if (deletedItem) {
+                        deletedItem.remove();
+                    }
+                })
+                .catch(error => {
+                    console.error("Error deleting appointment:", error);
+                });
+        }
+
+        // Function to save an appointment to localStorage
+        function saveAppointmentToStorage(appointment) {
+            const appointments = getStoredAppointments();
+            appointments.push(appointment);
+            localStorage.setItem("appointments", JSON.stringify(appointments));
+        }
+
+        // Function to remove an appointment from localStorage
+        function removeAppointmentFromStorage(appointment) {
+            const appointments = getStoredAppointments();
+            const updatedAppointments = appointments.filter(
+                storedAppointment => JSON.stringify(storedAppointment) !== JSON.stringify(appointment)
+            );
+            localStorage.setItem("appointments", JSON.stringify(updatedAppointments));
+        }
+
+        // Function to get stored appointments from localStorage
+        function getStoredAppointments() {
+            const appointments = localStorage.getItem("appointments");
+            return appointments ? JSON.parse(appointments) : [];
+        }
+
+        // Call the fetchData function to initially load data
+        fetchData();
+
+        // Add a submit event listener to the form
+        document.getElementById("appointmentForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            // Get input values
+            const fullName = document.getElementById("fullName").value;
+            const email = document.getElementById("email").value;
+            const phone = document.getElementById("phone").value;
+            const appointmentDate = document.getElementById("appointmentDate").value;
+
+            // Create a new appointment object
+            const newAppointment = {
+                fullName,
+                email,
+                phone,
+                appointmentDate
             };
-            expenses.push(expense);
-            localStorage.setItem('expensesData', JSON.stringify(expenses));
-            renderExpenseList();
-            expenseForm.reset();
-        }
 
-        // Function to delete an expense
-        function deleteExpense(index) {
-            expenses.splice(index, 1);
-            localStorage.setItem('expensesData', JSON.stringify(expenses));
-            renderExpenseList();
-        }
+            // Save the new appointment to localStorage
+            saveAppointmentToStorage(newAppointment);
 
-        // Function to edit an expense
-        function editExpense(index, description, amount, category) {
-            expenses[index].description = description;
-            expenses[index].amount = amount;
-            expenses[index].category = category;
-            localStorage.setItem('expensesData', JSON.stringify(expenses));
-            renderExpenseList();
-            expenseForm.reset();
-        }
+            // Send a POST request to the API to add the new appointment
+            axios.post("https://crudcrud.com/api/f52fb0fc98704096b135d0f5f4300bf1", newAppointment)
+                .then(response => {
+                    // After adding, fetch and display updated data
+                    fetchData();
+                })
+                .catch(error => {
+                    console.error("Error adding appointment:", error);
+                });
 
-        // Event listener for the expense form submission
-        const expenseForm = document.getElementById('expenseForm');
-        expenseForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const expenseDescription = document.getElementById('expenseDescription').value;
-            const expenseAmount = document.getElementById('expenseAmount').value;
-            const expenseCategory = document.getElementById('expenseCategory').value;
-
-            const editIndex = expenseForm.getAttribute('data-edit-index');
-            if (editIndex !== null) {
-                editExpense(editIndex, expenseDescription, expenseAmount, expenseCategory);
-                expenseForm.removeAttribute('data-edit-index');
-                document.getElementById('expenseForm').reset();
-                return;
-            }
-
-            addExpense(expenseDescription, expenseAmount, expenseCategory);
+            // Clear the form inputs
+            document.getElementById("fullName").value = "";
+            document.getElementById("email").value = "";
+            document.getElementById("phone").value = "";
+            document.getElementById("appointmentDate").value = "";
         });
 
-        // Event listener for the delete expense buttons
-        const expenseTable = document.getElementById('expenseTable');
-        expenseTable.addEventListener('click', function (e) {
-            if (e.target.classList.contains('deleteExpense')) {
-                const index = e.target.getAttribute('data-index');
-                deleteExpense(index);
-            }
-
-            if (e.target.classList.contains('editExpense')) {
-                const index = e.target.getAttribute('data-index');
-                const expense = expenses[index];
-                expenseForm.setAttribute('data-edit-index', index);
-                document.getElementById('expenseDescription').value = expense.description;
-                document.getElementById('expenseAmount').value = expense.amount;
-                document.getElementById('expenseCategory').value = expense.category;
-            }
+        // Load appointments from localStorage when the page loads
+        const storedAppointments = getStoredAppointments();
+        storedAppointments.forEach(appointment => {
+            saveAppointmentToStorage(appointment);
         });
-
-        // Initial rendering of the expense list
-        renderExpenseList();
     </script>
 </body>
-
 </html>
