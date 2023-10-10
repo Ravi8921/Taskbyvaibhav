@@ -60,7 +60,7 @@
         // Function to fetch and display data from the API
         function fetchData() {
             // Replace the placeholder URL with your actual API endpoint
-            axios.get("https://crudcrud.com/api/f52fb0fc98704096b135d0f5f4300bf1")
+            axios.get("https://crudcrud.com/api/f52fb0fc98704096b135d0f5f4300bf1/newappoint")
                 .then(response => {
                     const data = response.data;
                     const appointmentList = document.getElementById("appointmentList");
@@ -159,7 +159,7 @@
             saveAppointmentToStorage(newAppointment);
 
             // Send a POST request to the API to add the new appointment
-            axios.post("https://crudcrud.com/api/f52fb0fc98704096b135d0f5f4300bf1", newAppointment)
+            axios.post("https://crudcrud.com/api/f52fb0fc98704096b135d0f5f4300bf1/newappoint", newAppointment)
                 .then(response => {
                     // After adding, fetch and display updated data
                     fetchData();
